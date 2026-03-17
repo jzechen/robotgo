@@ -93,12 +93,12 @@
 /* Move the mouse to a specific point. */
 void moveMouse(MMPointInt32 point){
 	#if defined(IS_MACOSX)
-		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 		CGEventRef move = CGEventCreateMouseEvent(source, kCGEventMouseMoved, 
 								CGPointFromMMPointInt32(point), kCGMouseButtonLeft);
 
 		calculateDeltas(&move, point);
-		CGEventPost(kCGHIDEventTap, move);
+		CGEventPost(kCGSessionEventTap, move);
 		CFRelease(move);
 		CFRelease(source);
 	#elif defined(USE_X11)
@@ -114,13 +114,13 @@ void moveMouse(MMPointInt32 point){
 void dragMouse(MMPointInt32 point, const MMMouseButton button){
 	#if defined(IS_MACOSX)
 		const CGEventType dragType = MMMouseDragToCGEventType(button);
-		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 		CGEventRef drag = CGEventCreateMouseEvent(source, dragType, 
 								CGPointFromMMPointInt32(point), (CGMouseButton)button);
 
 		calculateDeltas(&drag, point);
 
-		CGEventPost(kCGHIDEventTap, drag);
+		CGEventPost(kCGSessionEventTap, drag);
 		CFRelease(drag);
 		CFRelease(source);
 	#else
@@ -158,7 +158,7 @@ int toggleMouse(bool down, MMMouseButton button) {
 	#if defined(IS_MACOSX)
 		const CGPoint currentPos = CGPointFromMMPointInt32(location());
 		const CGEventType mouseType = MMMouseToCGEventType(down, button);
-		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 		CGEventRef event = CGEventCreateMouseEvent(source, mouseType, currentPos, (CGMouseButton)button);
 
 		if (event == NULL) {
@@ -166,7 +166,7 @@ int toggleMouse(bool down, MMMouseButton button) {
 			return (int)kCGErrorCannotComplete;
 		}
 	
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 		CFRelease(event);
 		CFRelease(source);
 		return 0;
@@ -208,7 +208,7 @@ int doubleClick(MMMouseButton button, int count){
 		const CGEventType mouseTypeDown = MMMouseToCGEventType(true, button);
 		const CGEventType mouseTypeUP = MMMouseToCGEventType(false, button);
 
-		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 		CGEventRef event = CGEventCreateMouseEvent(source, mouseTypeDown, currentPos, kCGMouseButtonLeft);
 		if (event == NULL) {
 			CFRelease(source);
@@ -217,10 +217,10 @@ int doubleClick(MMMouseButton button, int count){
 
 		/* Set event to double click. */
 		CGEventSetIntegerValueField(event, kCGMouseEventClickState, count);
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 
 		CGEventSetType(event, mouseTypeUP);
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 
 		CFRelease(event);
 		CFRelease(source);
@@ -245,9 +245,9 @@ void scrollMouseXY(int x, int y) {
 	#endif
 
 	#if defined(IS_MACOSX)
-		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 		CGEventRef event = CGEventCreateScrollWheelEvent(source, kCGScrollEventUnitPixel, 2, y, x);	
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 
 		CFRelease(event);
 		CFRelease(source);
