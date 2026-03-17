@@ -59,9 +59,11 @@
 		if (pid != 0) {
 			CGEventPostToPid(pid, event);
 		} else {
-			CGEventPost(kCGHIDEventTap, event);
+			/* Use session-scoped event tap to avoid cross-session input leakage
+			 * (e.g. VNC isolated desktop vs local console user). */
+			CGEventPost(kCGSessionEventTap, event);
 		}
-		
+
 		CFRelease(event);
 		return 0;
 	}

@@ -98,7 +98,7 @@ void moveMouse(MMPointInt32 point){
 								CGPointFromMMPointInt32(point), kCGMouseButtonLeft);
 
 		calculateDeltas(&move, point);
-		CGEventPost(kCGHIDEventTap, move);
+		CGEventPost(kCGSessionEventTap, move);
 		CFRelease(move);
 		CFRelease(source);
 	#elif defined(USE_X11)
@@ -120,7 +120,7 @@ void dragMouse(MMPointInt32 point, const MMMouseButton button){
 
 		calculateDeltas(&drag, point);
 
-		CGEventPost(kCGHIDEventTap, drag);
+		CGEventPost(kCGSessionEventTap, drag);
 		CFRelease(drag);
 		CFRelease(source);
 	#else
@@ -166,7 +166,7 @@ int toggleMouse(bool down, MMMouseButton button) {
 			return (int)kCGErrorCannotComplete;
 		}
 	
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 		CFRelease(event);
 		CFRelease(source);
 		return 0;
@@ -217,10 +217,10 @@ int doubleClick(MMMouseButton button, int count){
 
 		/* Set event to double click. */
 		CGEventSetIntegerValueField(event, kCGMouseEventClickState, count);
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 
 		CGEventSetType(event, mouseTypeUP);
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 
 		CFRelease(event);
 		CFRelease(source);
@@ -247,7 +247,7 @@ void scrollMouseXY(int x, int y) {
 	#if defined(IS_MACOSX)
 		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
 		CGEventRef event = CGEventCreateScrollWheelEvent(source, kCGScrollEventUnitPixel, 2, y, x);	
-		CGEventPost(kCGHIDEventTap, event);
+		CGEventPost(kCGSessionEventTap, event);
 
 		CFRelease(event);
 		CFRelease(source);
