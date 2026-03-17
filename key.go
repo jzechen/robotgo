@@ -702,6 +702,16 @@ func Type(str string, args ...int) {
 		pid = args[0]
 	}
 
+	// On macOS, prefer AppleScript-based typing for default (pid==0) path.
+	// This is more reliable for isolated GUI sessions (e.g. VNC user sessions)
+	// than low-level CGEvent unicode injection.
+	if runtime.GOOS == "darwin" && pid == 0 {
+		if err := typeByOSAScript(str); err == nil {
+			MilliSleep(KeySleep)
+			return
+		}
+	}
+
 	if runtime.GOOS == "linux" {
 		strUc := ToUC(str)
 		for i := 0; i < len(strUc); i++ {
